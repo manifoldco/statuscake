@@ -41,7 +41,6 @@ func NewHTTPError(r *http.Response) *HTTPError {
 	httpError.StatusCode = r.StatusCode
 
 	// Attempt to read the body to find the error message.  Return if no body exists.
-	defer r.Body.Close()
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		return &httpError
