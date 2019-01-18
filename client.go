@@ -101,10 +101,7 @@ func (c *Client) doRequest(r *http.Request) (*http.Response, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, &httpError{
-			status:     resp.Status,
-			statusCode: resp.StatusCode,
-		}
+		return nil, NewHTTPError(resp)
 	}
 
 	var aer autheticationErrorResponse
@@ -116,6 +113,10 @@ func (c *Client) doRequest(r *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 
+	// TODO: remove if unnecessary
+	// Leaving this here as it was already here - would this never be called since
+	// authn failures should result in a 401 (unless status cake API doesn't do
+	// that for some operations)?
 	err = json.Unmarshal(b, &aer)
 	if err == nil && aer.ErrNo == 0 && aer.Error != "" {
 		return nil, &AuthenticationError{
